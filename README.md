@@ -1,73 +1,88 @@
-# Welcome to your Lovable project
+# FinRAG
 
-## Project info
+**FinRAG** is an advanced AI-powered financial planner and dashboard. It analyzes current stock trends, ingests news feeds and real-time stock data, and provides actionable investment analysis and recommendations. The platform leverages Google Gemini’s latest AI models, including retrieval-augmented generation (RAG) with a vector database, to deliver context-rich, personalized financial insights via an interactive chat interface and dashboard.
 
-**URL**: https://lovable.dev/projects/6548eee3-e2e6-4a35-b841-045bc51dfc21
+---
 
-## How can I edit this code?
+## Features
 
-There are several ways of editing your application.
+- **AI-driven financial analysis and planning**
+- **Real-time stock data and news feed integration**
+- **Automated investment recommendations**
+- **Gemini-powered retrieval from vector database for context-aware answers**
+- **Interactive chat interface for personalized advice**
+- **Comprehensive financial dashboard for tracking and visualization**
+- **FastAPI backend and React frontend**
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/6548eee3-e2e6-4a35-b841-045bc51dfc21) and start prompting.
+## Getting Started
 
-Changes made via Lovable will be committed automatically to this repo.
+### Prerequisites
 
-**Use your preferred IDE**
+- Python 3.10+
+- Node.js & npm
+- Google Cloud service account with Vertex AI User role
+- Gemini Generative Language API enabled in your Google Cloud project
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Backend Setup
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+1. Clone the repository.
+2. Create and activate a Python virtual environment:
+   ```sh
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+3. Install dependencies:
+   ```sh
+   pip install -r requirements.txt
+   ```
+4. Add your Google Cloud service account JSON file to the `backend` directory.
+5. Set environment variables:
+   ```sh
+   export GOOGLE_APPLICATION_CREDENTIALS="path/to/service-account.json"
+   ```
+6. Start the backend server:
+   ```sh
+   uvicorn backend.app:app --reload
+   ```
 
-Follow these steps:
+### Frontend Setup
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+1. Navigate to the frontend directory.
+2. Install dependencies:
+   ```sh
+   npm install
+   ```
+3. Start the frontend development server:
+   ```sh
+   npm run dev
+   ```
+4. Access the app at [http://localhost:8080](http://localhost:8080).
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+---
 
-# Step 3: Install the necessary dependencies.
-npm i
+## Usage
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+- Interact with the AI chatbot to get financial advice, stock analysis, and portfolio recommendations.
+- View your financial dashboard for real-time insights and visualizations.
+- The backend uses Gemini models to retrieve relevant information from the vector database and generate context-rich answers.
 
-**Edit a file directly in GitHub**
+---
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Contributing
 
-**Use GitHub Codespaces**
+We welcome collaborators!  
+If you’re interested in AI, finance, or full-stack development, feel free to open issues or submit pull requests.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+---
 
-## What technologies are used for this project?
+## License
 
-This project is built with:
+MIT
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+---
 
-## How can I deploy this project?
+## Contact
 
-Simply open [Lovable](https://lovable.dev/projects/6548eee3-e2e6-4a35-b841-045bc51dfc21) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+For questions or collaboration, please open an issue or contact the
