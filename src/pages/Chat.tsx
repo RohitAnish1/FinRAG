@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Send, Bot, User, Sparkles } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import QueryForm from "@/components/QueryForm";
 
 interface Message {
   id: string;
@@ -62,17 +63,34 @@ function ChatContent() {
     setInput('');
     setIsLoading(true);
 
-    // Simulate AI response
-    setTimeout(() => {
+    try {
+      const response = await fetch("http://localhost:8000/api/query", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: userMessage.content })
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch answer");
+      }
+      const data = await response.json();
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: sampleResponses[Math.floor(Math.random() * sampleResponses.length)],
+        content: data.answer,
         sender: 'ai',
         timestamp: new Date()
       };
       setMessages(prev => [...prev, aiMessage]);
+    } catch (error: any) {
+      const aiMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content: `Error: ${error.message}`,
+        sender: 'ai',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, aiMessage]);
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -180,6 +198,11 @@ function ChatContent() {
               </div>
             </div>
           )}
+
+          {/* Render QueryForm above input */}
+          <div className="p-4 border-t border-border">
+            <QueryForm />
+          </div>
 
           {/* Input */}
           <div className="p-4 border-t border-border">
