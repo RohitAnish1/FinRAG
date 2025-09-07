@@ -1,10 +1,10 @@
-# ingestion/rss_scraper.py
 import feedparser
 from newspaper import Article, Config
 import logging
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 import os
+import time
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -18,7 +18,7 @@ config.request_timeout = 20
 def fetch_and_parse_articles(rss_feeds):
     """
     Fetches articles from a list of RSS feeds, parses them,
-    and returns a list of dictionaries with title, url, and clean text.
+    and returns a list of dictionaries with title, url, clean text, and a precise timestamp.
     """
     articles_data = []
     for url in rss_feeds:
@@ -26,21 +26,29 @@ def fetch_and_parse_articles(rss_feeds):
         feed = feedparser.parse(url)
         for entry in feed.entries:
             try:
-                # Use newspaper3k to download and parse the article
                 article = Article(entry.link, config=config)
                 article.download()
-                # Some articles might fail downloading, handle this
                 if article.download_state != 2:
                     logging.warning(f"Failed to download article: {entry.link}")
                     continue
                 
                 article.parse()
 
-                # Append cleaned data
+                # --- Timestamp Extraction Logic ---
+                publish_timestamp = None
+                if hasattr(entry, 'published_parsed') and entry.published_parsed:
+                    publish_timestamp = datetime.fromtimestamp(time.mktime(entry.published_parsed)).astimezone(timezone.utc)
+                elif hasattr(article, 'publish_date') and article.publish_date:
+                    publish_timestamp = article.publish_date.astimezone(timezone.utc)
+                else:
+                    publish_timestamp = datetime.now(timezone.utc)
+                    logging.warning(f"Using current time for article with no publish date: {entry.link}")
+
                 articles_data.append({
                     'title': entry.title,
                     'url': entry.link,
-                    'text': article.text
+                    'text': article.text,
+                    'publish_timestamp': publish_timestamp.isoformat()
                 })
                 logging.info(f"Successfully parsed: {entry.title}")
 
@@ -50,20 +58,36 @@ def fetch_and_parse_articles(rss_feeds):
     return articles_data
 
 if __name__ == '__main__':
-    # Example financial RSS feeds (you can add more)
+    # --- NEW: Expanded and Diversified List of Financial RSS Feeds ---
     financial_feeds = [
+        # Major Indian Business News
         'https://economictimes.indiatimes.com/markets/rssfeeds/1977021501.cms',
         'https://www.livemint.com/rss/markets',
-        'http://feeds.reuters.com/reuters/businessNews'
+        'https://www.thehindubusinessline.com/markets/feeder/default.rss',
+        'https://www.business-standard.com/rss/markets-106.rss',
+        'https://www.financialexpress.com/market/feed/',
+        
+        # International News with focus on Indian Business
+        'http://feeds.reuters.com/reuters/businessNews',
+        'https://www.reuters.com/site-search/?query=india&sort=relevance&section=business&feed=atom',
+        'https://feeds.bbci.co.uk/news/business/rss.xml',
+        
+        # Stock Exchanges & Regulators
+        'https://www.bseindia.com/RssReader/corpann.aspx', # BSE Corporate Announcements
+        
+        # Market Analysis & Opinion
+        'https://www.moneycontrol.com/rss/marketreports.xml',
+        'https://www.moneycontrol.com/rss/business.xml'
     ]
     
     scraped_articles = fetch_and_parse_articles(financial_feeds)
     
-    # --- SAVE THE DATA TO A JSON FILE ---
-    output_dir = "data/raw_news"
+    # --- Save the data to a JSON file ---
+    SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
+    BACKEND_ROOT = os.path.dirname(SCRIPT_DIR)
+    output_dir = os.path.join(BACKEND_ROOT, "data", "raw_news")
     os.makedirs(output_dir, exist_ok=True)
     
-    # Create a filename with the current date
     date_str = datetime.now().strftime("%Y-%m-%d")
     filename = os.path.join(output_dir, f"news_{date_str}.json")
     
@@ -71,3 +95,4 @@ if __name__ == '__main__':
         json.dump(scraped_articles, f, ensure_ascii=False, indent=4)
         
     print(f"\n✅ Successfully scraped {len(scraped_articles)} articles and saved to {filename}")
+
