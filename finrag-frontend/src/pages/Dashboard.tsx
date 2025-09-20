@@ -1,189 +1,290 @@
-import Sidebar from "../components/Sidebar";
-import Header from "../components/Header";
-import { useNavigate } from "react-router-dom";
+"use client"
+import { useState } from "react"
+import { useNavigate } from "react-router-dom"
+import { useAuth } from "../contexts/AuthContext"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card"
+import { Button } from "../components/ui/button"
+import { Badge } from "../components/ui/badge"
+import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar"
+import { Sheet, SheetContent, SheetTrigger } from "../components/ui/sheet"
+import {
+  TrendingUp,
+  TrendingDown,
+  DollarSign,
+  PieChart,
+  BarChart3,
+  MessageSquare,
+  Bell,
+  Settings,
+  LogOut,
+  Home,
+  Wallet,
+  Target,
+  AlertTriangle,
+  Menu,
+  User,
+} from "lucide-react"
 
 export default function Dashboard() {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
+  const { user, logout } = useAuth()
+  const [activeTab, setActiveTab] = useState("dashboard")
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+
+  const handleLogout = () => {
+    logout()
+    navigate("/")
+  }
+
+  const portfolioData = [
+    { name: "Total Portfolio", value: "$124,567", change: "+5.2%", positive: true },
+    { name: "Today's P&L", value: "$1,234", change: "+2.1%", positive: true },
+    { name: "Monthly Return", value: "$8,456", change: "+12.3%", positive: true },
+    { name: "Cash Balance", value: "$15,678", change: "-1.2%", positive: false },
+  ]
+
+  const holdings = [
+    { symbol: "AAPL", name: "Apple Inc.", shares: 50, value: "$8,750", change: "+2.3%" },
+    { symbol: "GOOGL", name: "Alphabet Inc.", shares: 25, value: "$6,250", change: "+1.8%" },
+    { symbol: "TSLA", name: "Tesla Inc.", shares: 30, value: "$7,200", change: "-0.5%" },
+    { symbol: "MSFT", name: "Microsoft Corp.", shares: 40, value: "$12,800", change: "+3.1%" },
+  ]
+
+  const navigationItems = [
+    { id: "dashboard", label: "Dashboard", icon: Home, active: true },
+    { id: "portfolio", label: "Portfolio", icon: Wallet, onClick: () => navigate("/portfolio") },
+    { id: "chat", label: "AI Assistant", icon: MessageSquare, onClick: () => navigate("/chat") },
+    { id: "goals", label: "Goals", icon: Target },
+    { id: "analytics", label: "Analytics", icon: BarChart3 },
+    { id: "alerts", label: "Alerts", icon: Bell },
+  ]
+
+  const SidebarContent = () => (
+    <div className="flex flex-col h-full">
+      <div className="flex items-center gap-2 mb-8 px-6 pt-6">
+        <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+          <DollarSign className="h-5 w-5 text-primary-foreground" />
+        </div>
+        <span className="text-xl font-bold text-primary">FinRAG</span>
+      </div>
+
+      <nav className="space-y-2 px-6 flex-1">
+        {navigationItems.map((item) => (
+          <Button
+            key={item.id}
+            variant={activeTab === item.id ? "secondary" : "ghost"}
+            className="w-full justify-start gap-3"
+            onClick={() => {
+              if (item.onClick) {
+                item.onClick()
+              } else {
+                setActiveTab(item.id)
+              }
+              setIsMobileMenuOpen(false)
+            }}
+          >
+            <item.icon className="h-4 w-4" />
+            {item.label}
+          </Button>
+        ))}
+      </nav>
+
+      <div className="px-6 pb-6 space-y-2">
+        <Button variant="ghost" className="w-full justify-start gap-3">
+          <Settings className="h-4 w-4" />
+          Settings
+        </Button>
+        <Button variant="ghost" className="w-full justify-start gap-3" onClick={handleLogout}>
+          <LogOut className="h-4 w-4" />
+          Sign Out
+        </Button>
+      </div>
+    </div>
+  )
 
   return (
-    <div className="flex h-screen bg-gray-100 font-sans text-gray-900">
-      <Sidebar />
-      <main className="flex-1 md:ml-64 flex flex-col h-screen">
-        {/* Top Header Bar */}
-        <div className="flex items-center justify-between px-8 py-4 border-b bg-white">
-          <div />
-          <div className="flex items-center gap-4">
-            <button className="text-gray-400 hover:text-gray-700">
-              <span className="material-icons">notifications</span>
-            </button>
-            <button className="text-gray-400 hover:text-gray-700">
-              <span className="material-icons">dark_mode</span>
-            </button>
-            <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-700">
-              JD
-            </div>
-          </div>
-        </div>
-        {/* Dashboard Title */}
-        <div className="px-8 pt-8 pb-2">
-          <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
-          <p className="text-gray-500 mt-1">
-            Welcome back! Here's your financial overview.
-          </p>
-        </div>
-        {/* Dashboard Stats */}
-        <div className="px-8 grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col">
-            <h3 className="text-gray-500 font-medium">Total Portfolio</h3>
-            <p className="text-3xl font-bold text-gray-800 mt-2">
-              $102,582.35
-            </p>
-            <p className="text-sm text-red-500 mt-1">
-              ▼ 0.03% from yesterday
-            </p>
-          </div>
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col">
-            <h3 className="text-gray-500 font-medium">Day's Change</h3>
-            <p className="text-3xl font-bold text-red-500 mt-2">-$27.33</p>
-            <p className="text-sm text-red-500 mt-1">Loss today</p>
-          </div>
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col">
-            <h3 className="text-gray-500 font-medium">Active Positions</h3>
-            <p className="text-3xl font-bold text-gray-800 mt-2">4</p>
-            <p className="text-sm text-gray-500 mt-1">Across 4 stocks</p>
-          </div>
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col">
-            <h3 className="text-gray-500 font-medium">AI Confidence</h3>
-            <p className="text-3xl font-bold text-blue-600 mt-2">84%</p>
-            <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
-              <div
-                className="bg-blue-600 h-2.5 rounded-full"
-                style={{ width: "84%" }}
-              ></div>
-            </div>
-          </div>
-        </div>
-        {/* Portfolio + AI Suggestions */}
-        <div className="px-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <h2 className="text-xl font-bold text-gray-800 mb-1">
-              Portfolio Summary
-            </h2>
-            <p className="text-gray-500 mb-4">
-              Your current holdings and performance
-            </p>
-            <ul className="space-y-3">
-              <li className="flex justify-between items-center">
-                <span className="font-bold text-gray-800">
-                  AAPL{" "}
-                  <span className="ml-2 px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-xs font-semibold">
-                    50 shares
-                  </span>
-                </span>
-                <span className="text-right">
-                  <span className="font-semibold text-gray-800">$175.43</span>
-                  <span className="ml-2 text-green-600 font-medium text-sm">
-                    ▲ 2.34%
-                  </span>
-                </span>
-              </li>
-              <li className="flex justify-between items-center">
-                <span className="font-bold text-gray-800">
-                  GOOGL{" "}
-                  <span className="ml-2 px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-xs font-semibold">
-                    25 shares
-                  </span>
-                </span>
-                <span className="text-right">
-                  <span className="font-semibold text-gray-800">$2847.63</span>
-                  <span className="ml-2 text-red-600 font-medium text-sm">
-                    ▼ 1.23%
-                  </span>
-                </span>
-              </li>
-              <li className="flex justify-between items-center">
-                <span className="font-bold text-gray-800">
-                  TSLA{" "}
-                  <span className="ml-2 px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-xs font-semibold">
-                    30 shares
-                  </span>
-                </span>
-                <span className="text-right">
-                  <span className="font-semibold text-gray-800">$248.87</span>
-                  <span className="ml-2 text-green-600 font-medium text-sm">
-                    ▲ 5.67%
-                  </span>
-                </span>
-              </li>
-              <li className="flex justify-between items-center">
-                <span className="font-bold text-gray-800">
-                  MSFT{" "}
-                  <span className="ml-2 px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-xs font-semibold">
-                    40 shares
-                  </span>
-                </span>
-                <span className="text-right">
-                  <span className="font-semibold text-gray-800">$378.85</span>
-                  <span className="ml-2 text-green-600 font-medium text-sm">
-                    ▲ 1.45%
-                  </span>
-                </span>
-              </li>
-            </ul>
-          </div>
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <h2 className="text-xl font-bold text-gray-800 mb-1">
-              AI Investment Suggestions
-            </h2>
-            <p className="text-gray-500 mb-4">
-              Personalized recommendations based on market analysis
-            </p>
-            <div className="space-y-4">
-              <div className="p-3 rounded-lg border border-gray-200 flex justify-between items-center">
-                <div>
-                  <p className="font-bold text-gray-800">NVDA</p>
-                  <p className="text-sm text-gray-600 mt-1">
-                    Strong AI growth potential
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Confidence: 87%
-                  </p>
-                  <span className="text-xs font-medium bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full inline-block mt-2">
-                    Medium Risk
-                  </span>
-                </div>
-                <button className="bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-semibold hover:bg-blue-700">
-                  Buy
-                </button>
-              </div>
-              <div className="p-3 rounded-lg border border-gray-200 flex justify-between items-center">
-                <div>
-                  <p className="font-bold text-gray-800">BTC-ETF</p>
-                  <p className="text-sm text-gray-600 mt-1">
-                    Crypto market recovery signals
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Confidence: 72%
-                  </p>
-                  <span className="text-xs font-medium bg-red-100 text-red-800 px-2 py-0.5 rounded-full inline-block mt-2">
-                    High Risk
-                  </span>
-                </div>
-                <button className="bg-gray-200 text-gray-800 px-4 py-1 rounded-full text-sm font-semibold hover:bg-gray-300">
-                  Consider
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <button
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg mt-4"
-          onClick={() => navigate("/chat")}
-        >
-          Go to Chat
-        </button>
-      </main>
-    </div>
-  );
-}
+    <div className="min-h-screen bg-background">
+      {/* Desktop Sidebar */}
+      <div className="hidden lg:fixed lg:left-0 lg:top-0 lg:h-full lg:w-64 lg:bg-card lg:border-r lg:border-border lg:block">
+        <SidebarContent />
+      </div>
 
+      {/* Mobile Header */}
+      <div className="lg:hidden bg-card border-b border-border p-4 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+            <DollarSign className="h-5 w-5 text-primary-foreground" />
+          </div>
+          <span className="text-xl font-bold text-primary">FinRAG</span>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Avatar className="h-8 w-8">
+              <AvatarImage src={user?.avatar || "/placeholder.svg"} />
+              <AvatarFallback>
+                <User className="h-4 w-4" />
+              </AvatarFallback>
+            </Avatar>
+            <span className="text-sm font-medium hidden sm:block">{user?.name}</span>
+          </div>
+
+          <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="sm">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="p-0 w-64">
+              <SidebarContent />
+            </SheetContent>
+          </Sheet>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="lg:ml-64">
+        <div className="hidden lg:flex items-center justify-between p-6 bg-card border-b border-border">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+            <p className="text-muted-foreground">Welcome back, {user?.name}! Here's your portfolio overview.</p>
+          </div>
+          <div className="flex items-center gap-4">
+            <Button onClick={() => navigate("/chat")} size="sm">
+              <MessageSquare className="h-4 w-4 mr-2" />
+              Ask AI Assistant
+            </Button>
+            <div className="flex items-center gap-3">
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={user?.avatar || "/placeholder.svg"} />
+                <AvatarFallback>
+                  <User className="h-4 w-4" />
+                </AvatarFallback>
+              </Avatar>
+              <div className="text-right">
+                <div className="text-sm font-medium">{user?.name}</div>
+                <div className="text-xs text-muted-foreground">{user?.email}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-4 lg:p-6">
+          {/* Mobile page title */}
+          <div className="lg:hidden mb-6">
+            <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+            <p className="text-muted-foreground">Welcome back, {user?.name}!</p>
+          </div>
+
+          {/* Portfolio Overview */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
+            {portfolioData.map((item, index) => (
+              <Card key={index} className="metric-card">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">{item.name}</CardTitle>
+                  {item.positive ? (
+                    <TrendingUp className="h-4 w-4 text-success" />
+                  ) : (
+                    <TrendingDown className="h-4 w-4 text-destructive" />
+                  )}
+                </CardHeader>
+                <CardContent>
+                  <div className="text-xl lg:text-2xl font-bold">{item.value}</div>
+                  <Badge
+                    className={`mt-2 ${item.positive ? "bg-success text-success-foreground" : "bg-destructive text-destructive-foreground"}`}
+                  >
+                    {item.change}
+                  </Badge>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Holdings and Charts */}
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 lg:gap-6">
+            {/* Holdings */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <PieChart className="h-5 w-5" />
+                  Top Holdings
+                </CardTitle>
+                <CardDescription>Your largest portfolio positions</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {holdings.map((holding, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                      <div>
+                        <div className="font-medium">{holding.symbol}</div>
+                        <div className="text-sm text-muted-foreground">{holding.shares} shares</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-medium">{holding.value}</div>
+                        <div
+                          className={`text-sm ${holding.change.startsWith("+") ? "text-success" : "text-destructive"}`}
+                        >
+                          {holding.change}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* AI Insights */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5" />
+                  AI Insights & Alerts
+                </CardTitle>
+                <CardDescription>Personalized recommendations from your AI advisor</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="p-4 rounded-lg bg-success/10 border border-success/20">
+                    <div className="flex items-start gap-3">
+                      <TrendingUp className="h-5 w-5 text-success mt-0.5" />
+                      <div>
+                        <div className="font-medium text-success">Portfolio Rebalancing</div>
+                        <div className="text-sm text-muted-foreground mt-1">
+                          Consider rebalancing your tech allocation. Current: 65%, Target: 55%
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
+                    <div className="flex items-start gap-3">
+                      <DollarSign className="h-5 w-5 text-primary mt-0.5" />
+                      <div>
+                        <div className="font-medium text-primary">Investment Opportunity</div>
+                        <div className="text-sm text-muted-foreground mt-1">
+                          Market dip detected in renewable energy sector. Consider DCA strategy.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/20">
+                    <div className="flex items-start gap-3">
+                      <AlertTriangle className="h-5 w-5 text-destructive mt-0.5" />
+                      <div>
+                        <div className="font-medium text-destructive">Risk Alert</div>
+                        <div className="text-sm text-muted-foreground mt-1">
+                          High correlation detected between AAPL and GOOGL positions.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
