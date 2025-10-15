@@ -29,12 +29,32 @@ import {
   ArrowUp,
   ArrowDown,
 } from "lucide-react"
+import type { User as SupabaseUser } from '@supabase/supabase-js'
+
+export interface ExtendedUser extends SupabaseUser {
+  avatar?: string
+  name?: string
+}
+
+// Add the mapUser function
+const mapUser = (supabaseUser: SupabaseUser | null): ExtendedUser | null => {
+  if (!supabaseUser) return null;
+  
+  return {
+    ...supabaseUser,
+    avatar: supabaseUser.user_metadata?.avatar_url,
+    name: supabaseUser.user_metadata?.full_name || supabaseUser.email?.split('@')[0]
+  }
+}
 
 export default function Analytics() {
   const navigate = useNavigate()
-  const { user, logout } = useAuth()
+  const { user: authUser, logout } = useAuth()
   const [activeTab, setActiveTab] = useState("analytics")
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+
+  // Update user state to use mapped user
+  const user = mapUser(authUser)
 
   const handleLogout = () => {
     logout()

@@ -6,7 +6,7 @@ interface DialogProps {
   children: React.ReactNode;
 }
 
-export const Dialog: React.FC<DialogProps> = ({ open, onOpenChange, children }) => {
+export const Dialog: React.FC<DialogProps> = ({ open,children }) => {
   if (!open) return null;
   return <>{children}</>;
 };

@@ -36,7 +36,7 @@ interface SheetContentProps {
   children: React.ReactNode;
 }
 
-export const SheetContent: React.FC<SheetContentProps> = ({ side = 'right', className, children }) => {
+export const SheetContent: React.FC<SheetContentProps> = ({ className, children }) => {
   // You can add logic for different sides if needed
   return (
     <div className={cn(

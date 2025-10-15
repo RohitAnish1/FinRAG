@@ -7,7 +7,7 @@ interface SelectProps {
   className?: string;
 }
 
-export const Select: React.FC<SelectProps> = ({ value, onChange, children, className }) => {
+export const Select: React.FC<SelectProps> = ({ children, className }) => {
   return <div className={className}>{children}</div>;
 };
 
