@@ -6,10 +6,10 @@ import { motion } from "framer-motion"
 import { useAuth } from "../contexts/AuthContext"
 
 // Shadcn UI Components
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 import { Button } from "../components/ui/button"
 import { Badge } from "../components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar"
+import { Avatar, AvatarFallback} from "../components/ui/avatar"
 import { Sheet, SheetContent, SheetTrigger } from "../components/ui/sheet"
 import { Input } from "../components/ui/input"
 import { Progress } from "../components/ui/progress"
@@ -28,7 +28,6 @@ import {
   Menu,
   User,
   Bot,
-  ArrowUp,
   TrendingUp,
   TrendingDown,
   Send,

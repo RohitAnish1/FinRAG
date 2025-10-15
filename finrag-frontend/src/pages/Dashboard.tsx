@@ -5,7 +5,7 @@ import { useAuth } from "../contexts/AuthContext"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card"
 import { Button } from "../components/ui/button"
 import { Badge } from "../components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar"
+import { Avatar, AvatarFallback } from "../components/ui/avatar"
 import { Sheet, SheetContent, SheetTrigger } from "../components/ui/sheet"
 import {
   TrendingUp,
@@ -27,7 +27,7 @@ import {
 
 export default function Dashboard() {
   const navigate = useNavigate()
-  const { user, logout } = useAuth()
+  const { logout } = useAuth()
   const [activeTab, setActiveTab] = useState("dashboard")
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 

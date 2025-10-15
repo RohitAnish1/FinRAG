@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../co
 import { Button } from "../components/ui/button"
 import { Badge } from "../components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
-import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar"
+import { Avatar, AvatarFallback} from "../components/ui/avatar"
 import { Sheet, SheetContent, SheetTrigger } from "../components/ui/sheet"
 import { Progress } from "../components/ui/progress"
 import {
@@ -34,7 +34,7 @@ import {
 
 export default function Portfolio() {
   const navigate = useNavigate()
-  const { user, logout } = useAuth()
+  const { logout } = useAuth()
   const [activeTab, setActiveTab] = useState("portfolio")
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
