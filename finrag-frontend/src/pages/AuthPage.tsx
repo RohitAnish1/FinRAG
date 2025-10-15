@@ -9,23 +9,44 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../co
 import { Input } from "../components/ui/input"
 import { Label } from "../components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
-import { Separator } from "../components/ui/separator.tsx"
+import { Separator } from "../components/ui/separator"
 import { TrendingUp, Shield, Brain, BarChart3 } from "lucide-react"
 
 export default function AuthPage() {
-  const { login, isLoading, error } = useAuth()
+  const { login, signUp, signInWithGoogle, isLoading, error } = useAuth()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [fullName, setFullName] = useState("")
+  const [signupEmail, setSignupEmail] = useState("")
+  const [signupPassword, setSignupPassword] = useState("")
   const navigate = useNavigate()
 
-  const handleAuth = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-
     try {
       await login(email, password)
       navigate("/dashboard")
     } catch (err) {
       console.log("Login failed:", err)
+    }
+  }
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      await signUp(signupEmail, signupPassword, fullName)
+      // You might want to show a success message here
+      alert("Check your email for verification link!")
+    } catch (err) {
+      console.log("Sign up failed:", err)
+    }
+  }
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInWithGoogle()
+    } catch (err) {
+      console.log("Google sign in failed:", err)
     }
   }
 
@@ -81,13 +102,13 @@ export default function AuthPage() {
               </TabsList>
 
               <TabsContent value="login" className="space-y-4">
-                <form onSubmit={handleAuth} className="space-y-4">
+                <form onSubmit={handleLogin} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
                     <Input
                       id="email"
                       type="email"
-                      placeholder="demo@finrag.com"
+                      placeholder="Enter your email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
@@ -98,13 +119,12 @@ export default function AuthPage() {
                     <Input
                       id="password"
                       type="password"
-                      placeholder="demo123"
+                      placeholder="Enter your password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
                     />
                   </div>
-                  <p className="text-xs text-muted-foreground">Demo: email: demo@finrag.com, password: demo123</p>
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? "Signing in..." : "Sign In"}
                   </Button>
@@ -112,18 +132,39 @@ export default function AuthPage() {
               </TabsContent>
 
               <TabsContent value="signup" className="space-y-4">
-                <form onSubmit={handleAuth} className="space-y-4">
+                <form onSubmit={handleSignUp} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="name">Full Name</Label>
-                    <Input id="name" type="text" placeholder="Enter your full name" required />
+                    <Input 
+                      id="name" 
+                      type="text" 
+                      placeholder="Enter your full name" 
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      required 
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="signup-email">Email</Label>
-                    <Input id="signup-email" type="email" placeholder="Enter your email" required />
+                    <Input 
+                      id="signup-email" 
+                      type="email" 
+                      placeholder="Enter your email" 
+                      value={signupEmail}
+                      onChange={(e) => setSignupEmail(e.target.value)}
+                      required 
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="signup-password">Password</Label>
-                    <Input id="signup-password" type="password" placeholder="Create a password" required />
+                    <Input 
+                      id="signup-password" 
+                      type="password" 
+                      placeholder="Create a password" 
+                      value={signupPassword}
+                      onChange={(e) => setSignupPassword(e.target.value)}
+                      required 
+                    />
                   </div>
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? "Creating account..." : "Create Account"}
@@ -141,7 +182,7 @@ export default function AuthPage() {
                   <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
                 </div>
               </div>
-              <Button variant="outline" className="w-full mt-4 bg-transparent" onClick={handleAuth}>
+              <Button variant="outline" className="w-full mt-4 bg-transparent" onClick={handleGoogleSignIn} disabled={isLoading}>
                 <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                   <path
                     d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"

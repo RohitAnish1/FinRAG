@@ -1,19 +1,14 @@
-"use client"
-
-import type React from "react"
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
-
-interface User {
-  id: string
-  email: string
-  name: string
-  avatar?: string
-}
+import React, { createContext, useContext, useEffect, useState } from 'react'
+import type { User, Session } from '@supabase/supabase-js'
+import { supabase } from '../lib/supabase'
 
 interface AuthContextType {
   user: User | null
+  session: Session | null
   login: (email: string, password: string) => Promise<void>
-  logout: () => void
+  signUp: (email: string, password: string, fullName?: string) => Promise<void>
+  signInWithGoogle: () => Promise<void>
+  logout: () => Promise<void>
   isLoading: boolean
   error: string | null
 }
@@ -23,66 +18,110 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export const useAuth = () => {
   const context = useContext(AuthContext)
   if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider")
+    throw new Error('useAuth must be used within an AuthProvider')
   }
   return context
 }
 
-interface AuthProviderProps {
-  children: ReactNode
-}
-
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null)
+  const [session, setSession] = useState<Session | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // Check for existing session on mount
   useEffect(() => {
-    const savedUser = localStorage.getItem("finrag_user")
-    if (savedUser) {
-      setUser(JSON.parse(savedUser))
-    }
-    setIsLoading(false)
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+      setUser(session?.user ?? null)
+      setIsLoading(false)
+    })
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+      setUser(session?.user ?? null)
+      setIsLoading(false)
+    })
+
+    return () => subscription.unsubscribe()
   }, [])
 
-  const login = async (email: string, password: string): Promise<void> => {
+  const login = async (email: string, password: string) => {
+    setIsLoading(true)
+    setError(null)
+    
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
+
+    if (error) {
+      setError(error.message)
+      throw error
+    }
+    
+    setIsLoading(false)
+  }
+
+  const signUp = async (email: string, password: string, fullName?: string) => {
     setIsLoading(true)
     setError(null)
 
-    try {
-      // Mock authentication - replace with real API call
-      await new Promise((resolve) => setTimeout(resolve, 1000)) // Simulate API delay
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: fullName,
+        },
+      },
+    })
 
-      if (email === "demo@finrag.com" && password === "demo123") {
-        const mockUser: User = {
-          id: "1",
-          email: email,
-          name: "Demo User",
-          avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face",
-        }
-
-        setUser(mockUser)
-        localStorage.setItem("finrag_user", JSON.stringify(mockUser))
-      } else {
-        throw new Error("Invalid credentials")
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed")
-      throw err
-    } finally {
-      setIsLoading(false)
+    if (error) {
+      setError(error.message)
+      throw error
     }
+
+    setIsLoading(false)
   }
 
-  const logout = () => {
-    setUser(null)
-    localStorage.removeItem("finrag_user")
+  const signInWithGoogle = async () => {
+    setIsLoading(true)
+    setError(null)
+
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/dashboard`,
+      },
+    })
+
+    if (error) {
+      setError(error.message)
+      throw error
+    }
+
+    setIsLoading(false)
   }
 
-  const value: AuthContextType = {
+  const logout = async () => {
+    setIsLoading(true)
+    const { error } = await supabase.auth.signOut()
+    if (error) {
+      setError(error.message)
+    }
+    setIsLoading(false)
+  }
+
+  const value = {
     user,
+    session,
     login,
+    signUp,
+    signInWithGoogle,
     logout,
     isLoading,
     error,

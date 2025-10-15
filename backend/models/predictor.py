@@ -52,33 +52,22 @@ def make_prediction(model, feature_data, feature_list):
     """
     if model is None or feature_list is None:
         return {"error": "Model or feature list is not loaded."}
-    
     try:
         # Create a DataFrame from the input dictionary, ensuring it uses the exact feature order from training
         df = pd.DataFrame([feature_data])
-        # Reindex ensures that all required columns from the feature_list are present and in the correct order.
-        # Any missing features in the input data will be filled with 0.
         df = df.reindex(columns=feature_list, fill_value=0)
-        
-        # Convert the DataFrame to a DMatrix for efficient prediction
         dmatrix = xgb.DMatrix(df)
-        
-        # Predict the probability of the 'Up' class (1)
         prediction_proba = model.predict(dmatrix)
-        
-        # The output is an array, get the first element
+        if not isinstance(prediction_proba, (list, np.ndarray)) or len(prediction_proba) == 0:
+            return {"error": "Model did not return a valid prediction."}
         confidence_up = float(prediction_proba[0])
-        
-        # Determine prediction and confidence
         if confidence_up > 0.5:
             prediction = 'Up'
             confidence_pct = confidence_up * 100
         else:
             prediction = 'Down'
             confidence_pct = (1 - confidence_up) * 100
-            
         return {'prediction': prediction, 'confidence_pct': round(confidence_pct, 2)}
-        
     except Exception as e:
         return {"error": f"An error occurred during prediction: {e}"}
 

@@ -11,52 +11,58 @@ import Alerts from "./pages/Alerts"
 import "./App.css"
 
 function App() {
+  console.log("App component rendering...")
+
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
       <AuthProvider>
-        <Routes>
-          <Route path="/" element={<AuthPage />} />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/portfolio"
-            element={
-              <ProtectedRoute>
-                <Portfolio />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/analytics"
-            element={
-              <ProtectedRoute>
-                <Analytics />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/alerts"
-            element={
-              <ProtectedRoute>
-                <Alerts />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/chat"
-            element={
-              <ProtectedRoute>
-                <ChatbotPage />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
+        <div>
+          <Routes>
+            <Route path="/" element={<AuthPage />} />
+<Route path="/auth" element={<AuthPage />} />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/portfolio"
+              element={
+                <ProtectedRoute>
+                  <Portfolio />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/analytics"
+              element={
+                <ProtectedRoute>
+                  <Analytics />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/alerts"
+              element={
+                <ProtectedRoute>
+                  <Alerts />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/chat"
+              element={
+                <ProtectedRoute>
+                  <ChatbotPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="*" element={<div>404 - Page Not Found</div>} />
+          </Routes>
+        </div>
       </AuthProvider>
     </ThemeProvider>
   )

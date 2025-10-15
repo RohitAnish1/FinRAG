@@ -121,12 +121,10 @@ export default function Dashboard() {
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <Avatar className="h-8 w-8">
-              <AvatarImage src={user?.avatar || "/placeholder.svg"} />
               <AvatarFallback>
                 <User className="h-4 w-4" />
               </AvatarFallback>
             </Avatar>
-            <span className="text-sm font-medium hidden sm:block">{user?.name}</span>
           </div>
 
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
@@ -147,7 +145,7 @@ export default function Dashboard() {
         <div className="hidden lg:flex items-center justify-between p-6 bg-card border-b border-border">
           <div>
             <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-            <p className="text-muted-foreground">Welcome back, {user?.name}! Here's your portfolio overview.</p>
+            <p className="text-muted-foreground">Here's your portfolio overview.</p>
           </div>
           <div className="flex items-center gap-4">
             <Button onClick={() => navigate("/chat")} size="sm">
@@ -156,14 +154,12 @@ export default function Dashboard() {
             </Button>
             <div className="flex items-center gap-3">
               <Avatar className="h-8 w-8">
-                <AvatarImage src={user?.avatar || "/placeholder.svg"} />
                 <AvatarFallback>
                   <User className="h-4 w-4" />
                 </AvatarFallback>
               </Avatar>
               <div className="text-right">
-                <div className="text-sm font-medium">{user?.name}</div>
-                <div className="text-xs text-muted-foreground">{user?.email}</div>
+                <div className="text-xs text-muted-foreground">Logged In</div>
               </div>
             </div>
           </div>
@@ -173,7 +169,7 @@ export default function Dashboard() {
           {/* Mobile page title */}
           <div className="lg:hidden mb-6">
             <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-            <p className="text-muted-foreground">Welcome back, {user?.name}!</p>
+            <p className="text-muted-foreground">Welcome back</p>
           </div>
 
           {/* Portfolio Overview */}

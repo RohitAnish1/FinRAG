@@ -8,6 +8,9 @@ def add_features(df: pd.DataFrame) -> Optional[pd.DataFrame]:
     Adds a comprehensive set of technical analysis features to the stock data DataFrame.
     """
     try:
+        # Flatten MultiIndex if present
+        if isinstance(df.index, pd.MultiIndex):
+            df = df.reset_index()
         # Create a new 'ta' strategy
         MyStrategy = ta.Strategy(
             name="Comprehensive Indicators",
@@ -22,18 +25,13 @@ def add_features(df: pd.DataFrame) -> Optional[pd.DataFrame]:
                 {"kind": "obv"}               # On-Balance Volume (Volume-based momentum)
             ]
         )
-        
         # Apply the strategy to the DataFrame
         df.ta.strategy(MyStrategy)
-        
         # Calculate daily return separately
         df['Daily_Return'] = (df['Close'] - df['Open']) / df['Open']
-        
         # Drop rows with NaN values created by the indicators
         df.dropna(inplace=True)
-        
         return df
-
     except Exception as e:
         print(f"  -> Error adding features: {e}")
         return None

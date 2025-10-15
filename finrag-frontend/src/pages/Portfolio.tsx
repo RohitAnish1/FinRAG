@@ -206,12 +206,11 @@ export default function Portfolio() {
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <Avatar className="h-8 w-8">
-              <AvatarImage src={user?.avatar || "/placeholder.svg"} />
               <AvatarFallback>
                 <User className="h-4 w-4" />
               </AvatarFallback>
             </Avatar>
-            <span className="text-sm font-medium hidden sm:block">{user?.name}</span>
+            <span className="text-sm font-medium hidden sm:block">User</span>
           </div>
 
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
@@ -241,14 +240,13 @@ export default function Portfolio() {
             </Button>
             <div className="flex items-center gap-3">
               <Avatar className="h-8 w-8">
-                <AvatarImage src={user?.avatar || "/placeholder.svg"} />
                 <AvatarFallback>
                   <User className="h-4 w-4" />
                 </AvatarFallback>
               </Avatar>
               <div className="text-right">
-                <div className="text-sm font-medium">{user?.name}</div>
-                <div className="text-xs text-muted-foreground">{user?.email}</div>
+                <div className="text-sm font-medium">User</div>
+                <div className="text-xs text-muted-foreground">Logged In</div>
               </div>
             </div>
           </div>
