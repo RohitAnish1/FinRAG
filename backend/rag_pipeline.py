@@ -3,10 +3,8 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 import logging
 from langchain_community.vectorstores import FAISS
-# --- NEW: Import SentenceTransformer for local embeddings ---
 from langchain_community.embeddings import HuggingFaceEmbeddings
 
-# --- Configuration and Setup ---
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 load_dotenv()
 api_key = os.getenv("GOOGLE_API_KEY")
@@ -27,7 +25,7 @@ class RAGPipeline:
             
             self.embeddings = HuggingFaceEmbeddings(
                 model_name="sentence-transformers/all-MiniLM-L6-v2",
-                model_kwargs={'device': 'cuda'} # Use your GPU
+                model_kwargs={'device': 'cuda'}
             )
             
             logging.info("Loading LangChain FAISS vector store from disk...")
@@ -61,7 +59,6 @@ class RAGPipeline:
             return "\n\n---\n\n".join(retrieved_chunks), list(sources)
         except Exception as e:
             logging.error(f"Error during chunk retrieval: {e}")
-            # --- FIX: Return a valid tuple even on error to prevent crashes ---
             return "", []
 
     def generate_answer(self, query):

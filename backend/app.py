@@ -10,14 +10,12 @@ import yfinance as yf
 from datetime import datetime, timedelta
 import xgboost as xgb
 
-# --- Import Your Project Modules ---
 from rag_pipeline import RAGPipeline
 from agents.market_anayser import analyze_performance
 from features.market_feature_generator import add_features
 from data_processing.data_aligner import get_sentiment, TICKER_MAP
 from models.predictor import get_latest_model_and_features, make_prediction
 
-# --- Your Existing Auth Imports ---
 from google.oauth2 import service_account
 import google.auth.transport.requests
 import requests
@@ -26,13 +24,11 @@ import pytz
 import sys
 import platform
 
-# --- Initialize Models and Pipelines at Startup ---
 app = FastAPI()
 logging.basicConfig(level=logging.INFO)
 rag_pipeline = RAGPipeline()
 PREDICTOR_MODEL, MODEL_FEATURES = get_latest_model_and_features()
 
-# --- Your Existing CORS Setup ---
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],
@@ -41,7 +37,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# --- Your Existing Pydantic Models (Updated) ---
 class QueryRequest(BaseModel):
     query: str
 
@@ -49,11 +44,9 @@ class QueryResponse(BaseModel):
     answer: str
     sources: list = []
 
-# --- Your Existing Auth Functions (get_access_token, etc.) ---
 SERVICE_ACCOUNT_FILE = os.getenv("GOOGLE_APPLICATION_CREDENTIALS", "service-account.json")
 SCOPES = ["https://www.googleapis.com/auth/generative-language"]
 def get_access_token():
-    # Your existing get_access_token function...
     if not os.path.exists(SERVICE_ACCOUNT_FILE):
         raise Exception(f"Service account file not found: {SERVICE_ACCOUNT_FILE}")
     credentials = service_account.Credentials.from_service_account_file(
@@ -63,7 +56,6 @@ def get_access_token():
     credentials.refresh(auth_req)
     return credentials.token
 
-# --- NEW & UPDATED: Intent Parsing Logic ---
 PREDICTIVE_KEYWORDS = ['forecast', 'predict', 'prediction', 'outlook', 'will', 'what is the future of']
 ANALYTICAL_KEYWORDS = [
     'performance', 'performing', 'increase in price', 'decrease in price', 
@@ -73,7 +65,6 @@ ANALYTICAL_KEYWORDS = [
 
 def is_predictive_query(query: str) -> bool:
     query_lower = query.lower()
-    # Remove punctuation for better matching
     import re
     query_clean = re.sub(r"[\'\"\?\.,]", "", query_lower)
     return any(keyword in query_clean for keyword in PREDICTIVE_KEYWORDS)
@@ -114,7 +105,6 @@ def parse_max_price(query: str) -> float | None:
             return None
     return None
 
-# --- Main API Endpoint: The Upgraded Smart Router ---
 @app.post("/api/query", response_model=QueryResponse)
 async def handle_query(request: QueryRequest):
     query = request.query

@@ -204,35 +204,36 @@ export default function Analytics() {
       </div>
 
       {/* Mobile Header */}
-      <div className="lg:hidden bg-card border-b border-border p-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-            <DollarSign className="h-5 w-5 text-primary-foreground" />
-          </div>
-          <span className="text-xl font-bold text-primary">FinRAG</span>
-        </div>
-
+      <div className="lg:hidden bg-card border-b border-border p-4 flex items-center justify-between sticky top-0 z-40">
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <Avatar className="h-8 w-8">
-              <AvatarImage src={user?.avatar || "/placeholder.svg"} />
-              <AvatarFallback>
-                <User className="h-4 w-4" />
-              </AvatarFallback>
-            </Avatar>
-            <span className="text-sm font-medium hidden sm:block">{user?.name}</span>
-          </div>
-
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="sm">
+              <Button variant="outline" size="sm" className="lg:hidden">
                 <Menu className="h-5 w-5" />
+                <span className="sr-only">Open menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="p-0 w-64">
+            <SheetContent side="left" className="p-0 w-64 z-50">
               <SidebarContent />
             </SheetContent>
           </Sheet>
+          
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+              <DollarSign className="h-5 w-5 text-primary-foreground" />
+            </div>
+            <span className="text-xl font-bold text-primary">FinRAG</span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Avatar className="h-8 w-8">
+            <AvatarImage src={user?.avatar || "/placeholder.svg"} />
+            <AvatarFallback>
+              <User className="h-4 w-4" />
+            </AvatarFallback>
+          </Avatar>
+          <span className="text-sm font-medium hidden sm:block">{user?.name}</span>
         </div>
       </div>
 
@@ -264,10 +265,18 @@ export default function Analytics() {
         </div>
 
         <div className="p-4 lg:p-6">
-          {/* Mobile page title */}
+          {/* Mobile page title with actions */}
           <div className="lg:hidden mb-6">
-            <h1 className="text-2xl font-bold text-foreground">Analytics</h1>
-            <p className="text-muted-foreground">Market insights and sentiment</p>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h1 className="text-2xl font-bold text-foreground">Analytics</h1>
+                <p className="text-muted-foreground">Market insights and sentiment</p>
+              </div>
+              <Button onClick={() => navigate("/chat")} size="sm">
+                <MessageSquare className="h-4 w-4 mr-2" />
+                AI
+              </Button>
+            </div>
           </div>
 
           {/* Market Overview */}
@@ -326,11 +335,11 @@ export default function Analytics() {
           </div>
 
           <Tabs defaultValue="sentiment" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="sentiment">Sentiment</TabsTrigger>
-              <TabsTrigger value="indicators">Indicators</TabsTrigger>
-              <TabsTrigger value="news">News Analysis</TabsTrigger>
-              <TabsTrigger value="insights">AI Insights</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4">
+              <TabsTrigger value="sentiment" className="text-xs sm:text-sm">Sentiment</TabsTrigger>
+              <TabsTrigger value="indicators" className="text-xs sm:text-sm">Indicators</TabsTrigger>
+              <TabsTrigger value="news" className="text-xs sm:text-sm">News</TabsTrigger>
+              <TabsTrigger value="insights" className="text-xs sm:text-sm">AI Insights</TabsTrigger>
             </TabsList>
 
             <TabsContent value="sentiment" className="space-y-6">
@@ -377,7 +386,7 @@ export default function Analytics() {
             </TabsContent>
 
             <TabsContent value="indicators" className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6">
                 <Card>
                   <CardHeader>
                     <CardTitle>Market Indicators</CardTitle>
@@ -386,8 +395,8 @@ export default function Analytics() {
                   <CardContent>
                     <div className="space-y-4">
                       {marketIndicators.map((indicator, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 rounded-lg border bg-card">
-                          <div>
+                        <div key={index} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-lg border bg-card gap-2">
+                          <div className="flex-1">
                             <div className="font-medium">{indicator.name}</div>
                             <div className="text-sm text-muted-foreground">
                               Status:{" "}
@@ -404,7 +413,7 @@ export default function Analytics() {
                               </span>
                             </div>
                           </div>
-                          <div className="text-right">
+                          <div className="text-left sm:text-right">
                             <div className="font-medium">{indicator.value}</div>
                             <div
                               className={`text-sm ${indicator.change.startsWith("+") ? "text-success" : "text-destructive"}`}
@@ -429,7 +438,7 @@ export default function Analytics() {
                         <div className="text-4xl font-bold text-green-600">B+</div>
                         <div className="text-sm text-muted-foreground">Overall Market Health</div>
                       </div>
-                      <div className="space-y-3">
+                      <div className="grid grid-cols-2 gap-3">
                         <div className="flex justify-between">
                           <span className="text-sm">Liquidity</span>
                           <span className="text-sm font-medium">Good</span>
@@ -463,32 +472,30 @@ export default function Analytics() {
                   <div className="space-y-4">
                     {newsAnalysis.map((news, index) => (
                       <div key={index} className="p-4 rounded-lg border bg-card">
-                        <div className="flex items-start justify-between mb-2">
-                          <div className="flex-1">
-                            <h4 className="font-medium text-sm leading-relaxed">{news.headline}</h4>
-                            <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-                              <span>{news.source}</span>
-                              <span>{news.time}</span>
-                            </div>
+                        <div className="space-y-3">
+                          <h4 className="font-medium text-sm leading-relaxed">{news.headline}</h4>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <Badge
+                              variant={
+                                news.sentiment === "Positive"
+                                  ? "default"
+                                  : news.sentiment === "Negative"
+                                    ? "destructive"
+                                    : "secondary"
+                              }
+                              className="text-xs"
+                            >
+                              {news.sentiment}
+                            </Badge>
+                            <Badge variant="outline" className="text-xs">
+                              {news.impact} Impact
+                            </Badge>
+                            <div className="text-xs text-muted-foreground">Relevance: {news.relevance}%</div>
                           </div>
-                        </div>
-                        <div className="flex items-center gap-2 mt-3">
-                          <Badge
-                            variant={
-                              news.sentiment === "Positive"
-                                ? "default"
-                                : news.sentiment === "Negative"
-                                  ? "destructive"
-                                  : "secondary"
-                            }
-                            className="text-xs"
-                          >
-                            {news.sentiment}
-                          </Badge>
-                          <Badge variant="outline" className="text-xs">
-                            {news.impact} Impact
-                          </Badge>
-                          <div className="text-xs text-muted-foreground">Relevance: {news.relevance}%</div>
+                          <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
+                            <span>{news.source}</span>
+                            <span>{news.time}</span>
+                          </div>
                         </div>
                       </div>
                     ))}

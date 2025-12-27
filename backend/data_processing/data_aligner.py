@@ -163,7 +163,7 @@ def align_and_merge_data():
 
     # --- 6. Save Final Dataset ---
     combined_df.to_csv(OUTPUT_FILE, index=False)
-    print(f"\n✅ Final combined dataset created successfully!")
+    print(f"\n Final combined dataset created successfully!")
     print(f"  -> Shape of the dataset: {combined_df.shape}")
     print(f"  -> Saved to: {OUTPUT_FILE}")
 

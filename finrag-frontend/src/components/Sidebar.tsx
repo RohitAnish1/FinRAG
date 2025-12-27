@@ -1,29 +1,73 @@
-import { Home, MessageSquare, Briefcase, BarChart2, Bell } from "lucide-react"
+"use client"
+
+import { useNavigate } from "react-router-dom"
+import { useAuth } from "../contexts/AuthContext"
+import { Button } from "./ui/button"
+import {
+  DollarSign,
+  BarChart3,
+  MessageSquare,
+  Bell,
+  Settings,
+  LogOut,
+  Home,
+  Wallet,
+  Target,
+} from "lucide-react"
 
 export default function Sidebar() {
+  const navigate = useNavigate()
+  const { logout } = useAuth()
+
+  const handleLogout = () => {
+    logout()
+    navigate("/")
+  }
+
+  const navigationItems = [
+    { id: "dashboard", label: "Dashboard", icon: Home, onClick: () => navigate("/dashboard") },
+    { id: "portfolio", label: "Portfolio", icon: Wallet, onClick: () => navigate("/portfolio") },
+    { id: "chat", label: "AI Assistant", icon: MessageSquare, onClick: () => navigate("/chat") },
+    { id: "goals", label: "Goals", icon: Target, onClick: () => navigate("/goals") },
+    { id: "analytics", label: "Analytics", icon: BarChart3, onClick: () => navigate("/analytics") },
+    { id: "alerts", label: "Alerts", icon: Bell, onClick: () => navigate("/alerts") },
+  ]
+
   return (
-    <aside className="w-64 bg-white border-r border-gray-200 flex flex-col p-4 fixed h-full md:block hidden">
-      <div className="flex items-center mb-8 px-2">
-        <MessageSquare className="text-blue-600 mr-2" size={28} />
-        <span className="font-extrabold text-2xl text-gray-800">FinRAG</span>
+    <div className="hidden md:fixed md:left-0 md:top-0 md:h-full md:w-64 md:bg-white md:border-r md:border-gray-200 md:block z-30">
+      <div className="flex flex-col h-full">
+        <div className="flex items-center gap-2 mb-8 px-6 pt-6">
+          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+            <DollarSign className="h-5 w-5 text-white" />
+          </div>
+          <span className="text-xl font-bold text-blue-600">FinRAG</span>
+        </div>
+
+        <nav className="space-y-2 px-6 flex-1">
+          {navigationItems.map((item) => (
+            <Button
+              key={item.id}
+              variant="ghost"
+              className="w-full justify-start gap-3 hover:bg-gray-100 text-gray-700"
+              onClick={item.onClick}
+            >
+              <item.icon className="h-4 w-4" />
+              {item.label}
+            </Button>
+          ))}
+        </nav>
+
+        <div className="px-6 pb-6 space-y-2">
+          <Button variant="ghost" className="w-full justify-start gap-3 hover:bg-gray-100 text-gray-700">
+            <Settings className="h-4 w-4" />
+            Settings
+          </Button>
+          <Button variant="ghost" className="w-full justify-start gap-3 hover:bg-gray-100 text-gray-700" onClick={handleLogout}>
+            <LogOut className="h-4 w-4" />
+            Sign Out
+          </Button>
+        </div>
       </div>
-      <nav className="flex flex-col gap-2">
-        {[
-          { label: "Dashboard", icon: Home, active: true },
-          { label: "Chat", icon: MessageSquare },
-          { label: "Portfolio", icon: Briefcase },
-          { label: "Market", icon: BarChart2 },
-          { label: "Alerts", icon: Bell },
-        ].map((item) => (
-          <button
-            key={item.label}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-sm font-semibold ${item.active ? "bg-blue-50 text-blue-700" : "text-gray-600 hover:bg-gray-100"}`}
-          >
-            <item.icon size={20} />
-            {item.label}
-          </button>
-        ))}
-      </nav>
-    </aside>
+    </div>
   )
 }

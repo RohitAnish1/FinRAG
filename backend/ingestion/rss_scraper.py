@@ -6,10 +6,8 @@ from datetime import datetime, timezone
 import os
 import time
 
-# Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# User agent to mimic a browser
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
 config = Config()
 config.browser_user_agent = USER_AGENT
@@ -34,7 +32,6 @@ def fetch_and_parse_articles(rss_feeds):
                 
                 article.parse()
 
-                # --- Timestamp Extraction Logic ---
                 publish_timestamp = None
                 if hasattr(entry, 'published_parsed') and entry.published_parsed:
                     publish_timestamp = datetime.fromtimestamp(time.mktime(entry.published_parsed)).astimezone(timezone.utc)
@@ -58,7 +55,6 @@ def fetch_and_parse_articles(rss_feeds):
     return articles_data
 
 if __name__ == '__main__':
-    # --- NEW: Expanded and Diversified List of Financial RSS Feeds ---
     financial_feeds = [
         # Major Indian Business News
         'https://economictimes.indiatimes.com/markets/rssfeeds/1977021501.cms',
@@ -82,7 +78,6 @@ if __name__ == '__main__':
     
     scraped_articles = fetch_and_parse_articles(financial_feeds)
     
-    # --- Save the data to a JSON file ---
     SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
     BACKEND_ROOT = os.path.dirname(SCRIPT_DIR)
     output_dir = os.path.join(BACKEND_ROOT, "data", "raw_news")
@@ -94,5 +89,5 @@ if __name__ == '__main__':
     with open(filename, 'w', encoding='utf-8') as f:
         json.dump(scraped_articles, f, ensure_ascii=False, indent=4)
         
-    print(f"\n✅ Successfully scraped {len(scraped_articles)} articles and saved to {filename}")
+    print(f"\n Successfully scraped {len(scraped_articles)} articles and saved to {filename}")
 

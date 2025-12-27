@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import { motion } from "framer-motion"
 import { useAuth } from "../contexts/AuthContext"
+import MobileHeader from "../components/MobileHeader"
+import Sidebar from "../components/Sidebar"
 
 // Shadcn UI Components
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
@@ -110,7 +112,6 @@ const AiAnswer = ({ data }: { data: AiData }) => {
 export default function ChatPage() {
   const navigate = useNavigate()
   const { user, logout } = useAuth()
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const [query, setQuery] = useState("")
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([
@@ -172,86 +173,21 @@ export default function ChatPage() {
     setLoading(false)
   }
 
-  const navigationItems = [
-    { id: "dashboard", label: "Dashboard", icon: Home, onClick: () => navigate("/dashboard") },
-    { id: "portfolio", label: "Portfolio", icon: Wallet, onClick: () => navigate("/portfolio") },
-    { id: "chat", label: "AI Assistant", icon: MessageSquare, active: true },
-    { id: "goals", label: "Goals", icon: Target },
-    { id: "analytics", label: "Analytics", icon: BarChart3 },
-    { id: "alerts", label: "Alerts", icon: Bell },
-  ]
-
-  const SidebarContent = () => (
-    <div className="flex flex-col h-full">
-      <div className="flex items-center gap-2 mb-8 px-6 pt-6">
-        <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-          <DollarSign className="h-5 w-5 text-primary-foreground" />
-        </div>
-        <span className="text-xl font-bold text-primary">FinRAG</span>
-      </div>
-      <nav className="space-y-2 px-6 flex-1">
-        {navigationItems.map((item) => (
-          <Button
-            key={item.id}
-            variant={item.active ? "secondary" : "ghost"}
-            className="w-full justify-start gap-3"
-            onClick={() => {
-              if (item.onClick) item.onClick()
-              setIsMobileMenuOpen(false)
-            }}
-          >
-            <item.icon className="h-4 w-4" />
-            {item.label}
-          </Button>
-        ))}
-      </nav>
-      <div className="px-6 pb-6 space-y-2">
-        <Button variant="ghost" className="w-full justify-start gap-3">
-          <Settings className="h-4 w-4" />
-          Settings
-        </Button>
-        <Button variant="ghost" className="w-full justify-start gap-3" onClick={handleLogout}>
-          <LogOut className="h-4 w-4" />
-          Sign Out
-        </Button>
-      </div>
-    </div>
-  )
-
   return (
-    <div className="min-h-screen bg-background">
-      {/* Desktop Sidebar */}
-      <div className="hidden lg:fixed lg:left-0 lg:top-0 lg:h-full lg:w-64 lg:bg-card lg:border-r lg:border-border lg:block">
-        <SidebarContent />
-      </div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Mobile Header (visible on phones) */}
+      <MobileHeader showSidebarButton />
 
-      {/* Mobile Header */}
-      <div className="lg:hidden bg-card border-b border-border p-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-            <DollarSign className="h-5 w-5 text-primary-foreground" />
-          </div>
-          <span className="text-xl font-bold text-primary">FinRAG</span>
-        </div>
-        <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="sm">
-              <Menu className="h-5 w-5" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="p-0 w-64">
-            <SidebarContent />
-          </SheetContent>
-        </Sheet>
-      </div>
+      {/* Desktop Sidebar (visible on large screens) */}
+      <Sidebar />
 
       {/* Main Content Area */}
-      <div className="lg:ml-64 flex flex-col" style={{ height: "100vh" }}>
+      <div className="md:ml-64 flex flex-col" style={{ height: "100vh" }}>
         {/* Desktop Header for Main Content */}
-        <div className="hidden lg:flex items-center justify-between p-6 bg-card border-b border-border">
+        <div className="hidden md:flex items-center justify-between p-6 bg-white border-b border-gray-200">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">AI Assistant</h1>
-            <p className="text-muted-foreground">Ask questions about markets, stocks, and your portfolio.</p>
+            <h1 className="text-2xl font-bold text-gray-900">AI Assistant</h1>
+            <p className="text-gray-600">Ask questions about markets, stocks, and your portfolio.</p>
           </div>
           <div className="flex items-center gap-3">
             <Avatar className="h-8 w-8">
@@ -260,13 +196,13 @@ export default function ChatPage() {
               </AvatarFallback>
             </Avatar>
             <div className="text-right">
-              <div className="text-xs text-muted-foreground">{user?.email}</div>
+              <div className="text-xs text-gray-500">{user?.email}</div>
             </div>
           </div>
         </div>
 
         {/* Chat History */}
-        <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
           {chatHistory.map((message, index) => (
             <motion.div
               key={index}
@@ -276,7 +212,7 @@ export default function ChatPage() {
             >
               {message.type === "ai" && (
                 <Avatar className="h-9 w-9 flex-shrink-0">
-                  <AvatarFallback className="bg-primary text-primary-foreground">
+                  <AvatarFallback className="bg-blue-600 text-white">
                     <Bot size={20} />
                   </AvatarFallback>
                 </Avatar>
@@ -285,8 +221,8 @@ export default function ChatPage() {
               <div
                 className={`max-w-xl rounded-lg px-4 py-3 ${
                   message.type === "user"
-                    ? "bg-primary text-primary-foreground rounded-br-none"
-                    : "bg-card border border-border rounded-bl-none"
+                    ? "bg-blue-600 text-white rounded-br-none"
+                    : "bg-white border border-gray-200 rounded-bl-none"
                 }`}
               >
                 {message.type === "user" ? (
@@ -295,22 +231,28 @@ export default function ChatPage() {
                   <div className="space-y-4">
                     <AiAnswer data={message.data ?? {}} />
                     {message.data?.sources && message.data.sources.length > 0 && (
-                      <div className="pt-3 border-t border-border/50">
-                        <h4 className="font-semibold text-xs text-muted-foreground mb-2">Sources:</h4>
+                      <div className="pt-3 border-t border-gray-200">
+                        <h4 className="font-semibold text-xs text-gray-600 mb-2">Sources:</h4>
                         <div className="flex flex-wrap gap-2">
-                          {message.data.sources.map((source, i) => (
-                            <a
-                              href={source}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              key={i}
-                              className="text-xs"
-                            >
-                              <Badge variant="outline">
-                                {new URL(source).hostname || `Source ${i + 1}`}
-                              </Badge>
-                            </a>
-                          ))}
+                          {message.data?.sources.map((source, i) => {
+  let hostname = `Source ${i + 1}`;
+  try {
+    hostname = new URL(source).hostname;
+  } catch (err) {
+    console.error(`Invalid URL: ${source}`, err);
+  }
+  return (
+    <a
+      href={source}
+      target="_blank"
+      rel="noopener noreferrer"
+      key={i}
+      className="text-xs"
+    >
+      <Badge variant="outline">{hostname}</Badge>
+    </a>
+  );
+})}
                         </div>
                       </div>
                     )}
@@ -331,7 +273,7 @@ export default function ChatPage() {
         </div>
 
         {/* Query Input Area */}
-        <div className="p-4 lg:p-6 bg-card/80 backdrop-blur-sm border-t border-border">
+        <div className="p-4 md:p-6 bg-white border-t border-gray-200">
           <div className="mb-3 flex flex-wrap gap-2">
             {quickQuestions.map((q) => (
               <Button
@@ -339,7 +281,7 @@ export default function ChatPage() {
                 size="sm"
                 variant="outline"
                 onClick={() => handleSubmit(q)}
-                className="text-xs"
+                className="text-xs flex-shrink-0"
                 disabled={loading}
               >
                 {q}

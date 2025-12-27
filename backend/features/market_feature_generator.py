@@ -66,26 +66,4 @@ if __name__ == "__main__":
                     print(f"  -> Processed {filename} | Added SMA, EMA, RSI, MACD, ATR, OBV")
                 else:
                     print(f"  -> Skipping {filename} due to an error or no data after processing.")
-        print("\n✅ Feature generation process complete.")
-##```
-
-### Your Action Plan (Crucial Steps)
-
-##To see the benefit of these new features, you must **regenerate your entire dataset and retrain the model**.
-
-##**Step 1: Re-run the Feature Generator**
-##Navigate to your `backend` directory in the terminal and run the script you just updated. This will create new files in `data/featured_data/` that now include the `ATRr_14` and `OBV` columns.
-##```bash
-##python features/market_feature_generator.py
-##```
-
-##**Step 2: Re-run the Data Aligner**
-##This is a **critical step**. You must run the aligner again to take your newly featured market data and merge it with the news embeddings. This will create an updated `combined_ml_dataset.csv`.
-##```bash
-##python data_processing/data_aligner.py
-##```
-
-##**Step 3: Re-run the Training Script**
-##Finally, train a new model (which we can call v3) on this superior dataset. The `train.py` script doesn't need any changes; it will automatically use the new features from the updated dataset.
-##```bash
-##python models/train.py
+        print("\n Feature generation process complete.")

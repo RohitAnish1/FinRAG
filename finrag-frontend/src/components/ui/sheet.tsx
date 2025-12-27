@@ -9,20 +9,21 @@ interface SheetProps {
 }
 
 export const Sheet: React.FC<SheetProps> = ({ open, onOpenChange, children, className }) => {
-  if (!open) return null;
   return (
-    <div className={cn("fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40", className)}>
-      <div className="bg-white rounded-lg shadow-lg p-6 relative min-w-[300px] max-w-lg w-full">
-        <button
-          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-          onClick={() => onOpenChange(false)}
-          aria-label="Close"
-        >
-          ×
-        </button>
-        {children}
-      </div>
-    </div>
+    <>
+      {open && (
+        <div className={cn("fixed inset-0 z-50 bg-black bg-opacity-40", className)}>
+          <div className="fixed inset-0 flex">
+            <div
+              className="flex-1 bg-black opacity-40"
+              onClick={() => onOpenChange(false)}
+              aria-hidden="true"
+            />
+            {children}
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
@@ -31,21 +32,28 @@ export const SheetTrigger: React.FC<{ asChild?: boolean; children: React.ReactNo
 };
 
 interface SheetContentProps {
-  side?: 'left' | 'right' | 'top' | 'bottom';
+  side?: "left" | "right" | "top" | "bottom";
   className?: string;
   children: React.ReactNode;
 }
 
-export const SheetContent: React.FC<SheetContentProps> = ({ className, children }) => {
-  // You can add logic for different sides if needed
+export const SheetContent: React.FC<SheetContentProps> = ({ side = "left", className, children }) => {
+  const sideClasses = {
+    left: "translate-x-0 left-0",
+    right: "translate-x-0 right-0",
+    top: "translate-y-0 top-0",
+    bottom: "translate-y-0 bottom-0",
+  };
+
   return (
-    <div className={cn(
-      `fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40`,
-      className
-    )}>
-      <div className="bg-white rounded-lg shadow-lg p-6 relative min-w-[300px] max-w-lg w-full">
-        {children}
-      </div>
+    <div
+      className={cn(
+        "fixed z-50 bg-white shadow-lg transition-transform transform h-full w-64",
+        sideClasses[side],
+        className
+      )}
+    >
+      {children}
     </div>
   );
 };

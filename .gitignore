@@ -30,3 +30,4 @@ __pycache__/
 .env
 .env.*
 backend/data/combined_ml_dataset.csv
+backend/service-account.json

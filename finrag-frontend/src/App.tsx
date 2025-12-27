@@ -8,6 +8,7 @@ import ChatbotPage from "./pages/ChatbotPage"
 import Portfolio from "./pages/Portfolio"
 import Analytics from "./pages/Analytics"
 import Alerts from "./pages/Alerts"
+import Goals from "./pages/Goals"
 import "./App.css"
 
 function App() {
@@ -19,7 +20,7 @@ function App() {
         <div>
           <Routes>
             <Route path="/" element={<AuthPage />} />
-<Route path="/auth" element={<AuthPage />} />
+            <Route path="/auth" element={<AuthPage />} />
             <Route
               path="/dashboard"
               element={
@@ -49,6 +50,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Alerts />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/goals"
+              element={
+                <ProtectedRoute>
+                  <Goals />
                 </ProtectedRoute>
               }
             />
