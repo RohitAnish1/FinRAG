@@ -8,24 +8,24 @@ def analyze_vector_store():
     chunks_path = "embeddings/vector_store/chunks.pkl"
     
     if not os.path.exists(chunks_path):
-        print("❌ Vector store not found!")
+        print(" Vector store not found!")
         return
     
     with open(chunks_path, "rb") as f:
         chunks = pickle.load(f)
     
-    print(f"📊 Total chunks in vector store: {len(chunks)}")
+    print(f"Total chunks in vector store: {len(chunks)}")
     print("\n" + "="*50)
     
     # Analyze sources
     sources = [chunk.get('source', 'unknown') for chunk in chunks]
     source_counts = Counter(sources)
-    print("\n📁 Sources breakdown:")
+    print("\n Sources breakdown:")
     for source, count in source_counts.items():
         print(f"  {source}: {count} chunks")
     
     # Show sample chunks
-    print("\n📄 Sample chunks:")
+    print("\n Sample chunks:")
     for i, chunk in enumerate(chunks[:5]):
         print(f"\n{i+1}. Title: {chunk.get('title', 'No title')}")
         print(f"   Source: {chunk.get('source', 'No source')}")
@@ -36,18 +36,18 @@ def analyze_vector_store():
                       if 'reliance' in chunk.get('content', '').lower() or 
                          'reliance' in chunk.get('title', '').lower()]
     
-    print(f"\n🔍 Reliance-related chunks found: {len(reliance_chunks)}")
+    print(f"\n Reliance-related chunks found: {len(reliance_chunks)}")
     
     if reliance_chunks:
-        print("\n📰 Reliance content samples:")
+        print("\n Reliance content samples:")
         for i, chunk in enumerate(reliance_chunks[:3]):
             print(f"\n{i+1}. Title: {chunk.get('title', 'No title')}")
             print(f"   Content: {chunk.get('content', 'No content')[:300]}...")
     else:
-        print("❌ No Reliance-related content found in vector store!")
+        print("No Reliance-related content found in vector store!")
         
     # Show what companies ARE mentioned
-    print("\n🏢 Companies mentioned in content:")
+    print("\nCompanies mentioned in content:")
     company_keywords = ['hdfc', 'icici', 'tcs', 'infy', 'sbin', 'itc', 'bank', 'stock', 'reliance']
     for keyword in company_keywords:
         matching_chunks = [chunk for chunk in chunks 
@@ -62,10 +62,10 @@ def test_query_retrieval():
     sys.path.append('..')
     
     try:
-        from rag_pipeline import RAGPipeline, configure_genai
+        from backend.rag_pipeline.rag_pipeline import RAGPipeline, configure_genai
         
         print("\n" + "="*60)
-        print("🔍 TESTING QUERY RETRIEVAL")
+        print("TESTING QUERY RETRIEVAL")
         print("="*60)
         
         configure_genai()
@@ -77,7 +77,7 @@ def test_query_retrieval():
         # Get retrieved chunks
         retrieved_chunks = rag.retrieve_relevant_chunks(query, k=7)
         
-        print(f"\n📊 Retrieved {len(retrieved_chunks)} chunks:")
+        print(f"\nRetrieved {len(retrieved_chunks)} chunks:")
         print("-" * 50)
         
         for i, chunk in enumerate(retrieved_chunks):
@@ -88,7 +88,7 @@ def test_query_retrieval():
             
             # Check if it mentions Reliance
             has_reliance = 'reliance' in content.lower() or 'reliance' in chunk.get('title', '').lower()
-            print(f"   Contains 'Reliance': {has_reliance} ✅" if has_reliance else f"   Contains 'Reliance': {has_reliance} ❌")
+            print(f"   Contains 'Reliance': {has_reliance} " if has_reliance else f"   Contains 'Reliance': {has_reliance} ")
         
         # Test different queries
         test_queries = [
@@ -109,14 +109,14 @@ def test_query_retrieval():
                 content = chunk.get('content', 'No content')
                 has_reliance = 'reliance' in content.lower() or 'reliance' in chunk.get('title', '').lower()
                 print(f"\n{i+1}. {chunk.get('title', 'No title')[:60]}...")
-                print(f"   Contains Reliance: {has_reliance} {'✅' if has_reliance else '❌'}")
+                print(f"   Contains Reliance: {has_reliance} {'' if has_reliance else ''}")
                 if has_reliance:
                     print(f"   Content: {content[:150]}...")
         
         print("\n" + "="*60)
         
     except Exception as e:
-        print(f"❌ Error testing retrieval: {e}")
+        print(f" Error testing retrieval: {e}")
         print("Make sure rag_pipeline.py is working and vector store exists.")
 
 if __name__ == "__main__":

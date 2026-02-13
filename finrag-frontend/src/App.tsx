@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom"
 import { ThemeProvider } from "./components/ui/theme-provider"
 import { AuthProvider } from "./contexts/AuthContext"
-import { ProtectedRoute } from "./components/ProtectedRoute"
+import ProtectedRoute from "./components/ProtectedRoute"
 import AuthPage from "./pages/AuthPage"
 import Dashboard from "./pages/Dashboard"
 import ChatbotPage from "./pages/ChatbotPage"
@@ -9,6 +9,7 @@ import Portfolio from "./pages/Portfolio"
 import Analytics from "./pages/Analytics"
 import Alerts from "./pages/Alerts"
 import Goals from "./pages/Goals"
+import Markets from "./pages/Markets"
 import "./App.css"
 
 function App() {
@@ -69,6 +70,14 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+            path="/markets"
+              element={
+               <ProtectedRoute>
+                <Markets />
+              </ProtectedRoute>
+              }
+             />
             <Route path="*" element={<div>404 - Page Not Found</div>} />
           </Routes>
         </div>

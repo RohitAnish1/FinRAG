@@ -1,7 +1,7 @@
 "use client"
 
 import { useNavigate } from "react-router-dom"
-import { useAuth } from "../contexts/AuthContext"
+import { useAuth } from "../hooks/useAuth"
 import { Button } from "./ui/button"
 import {
   DollarSign,
@@ -13,6 +13,7 @@ import {
   Home,
   Wallet,
   Target,
+  Globe, // Add the Globe icon for the Markets page
 } from "lucide-react"
 
 export default function Sidebar() {
@@ -31,6 +32,7 @@ export default function Sidebar() {
     { id: "goals", label: "Goals", icon: Target, onClick: () => navigate("/goals") },
     { id: "analytics", label: "Analytics", icon: BarChart3, onClick: () => navigate("/analytics") },
     { id: "alerts", label: "Alerts", icon: Bell, onClick: () => navigate("/alerts") },
+    { id: "markets", label: "Markets", icon: Globe, onClick: () => navigate("/markets") }, // Add Markets page
   ]
 
   return (

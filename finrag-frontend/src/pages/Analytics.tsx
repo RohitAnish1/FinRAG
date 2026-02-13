@@ -1,542 +1,366 @@
 "use client"
 
-import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { useAuth } from "../contexts/AuthContext"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card"
-import { Button } from "../components/ui/button"
-import { Badge } from "../components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
-import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar"
-import { Sheet, SheetContent, SheetTrigger } from "../components/ui/sheet"
-import { Progress } from "../components/ui/progress"
+import { useAnalytics } from "../hooks/useAnalytics"
 import {
-  TrendingUp,
-  DollarSign,
-  BarChart3,
-  MessageSquare,
-  Bell,
-  Settings,
-  LogOut,
-  Home,
-  Wallet,
-  Target,
-  Menu,
-  User,
-  Activity,
-  Zap,
-  Brain,
-  ArrowUp,
-  ArrowDown,
-} from "lucide-react"
-import type { User as SupabaseUser } from '@supabase/supabase-js'
-
-export interface ExtendedUser extends SupabaseUser {
-  avatar?: string
-  name?: string
-}
-
-// Add the mapUser function
-const mapUser = (supabaseUser: SupabaseUser | null): ExtendedUser | null => {
-  if (!supabaseUser) return null;
-  
-  return {
-    ...supabaseUser,
-    avatar: supabaseUser.user_metadata?.avatar_url,
-    name: supabaseUser.user_metadata?.full_name || supabaseUser.email?.split('@')[0]
-  }
-}
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from "../components/ui/card"
+import { Badge } from "../components/ui/badge"
+import { Button } from "../components/ui/button"
+import { Progress } from "../components/ui/progress"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
+import MobileHeader from "../components/MobileHeader"
+import Sidebar from "../components/Sidebar"
 
 export default function Analytics() {
   const navigate = useNavigate()
-  const { user: authUser, logout } = useAuth()
-  const [activeTab, setActiveTab] = useState("analytics")
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const { analytics, loading, error } = useAnalytics()
 
-  // Update user state to use mapped user
-  const user = mapUser(authUser)
-
-  const handleLogout = () => {
-    logout()
-    navigate("/")
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <MobileHeader showSidebarButton />
+        <Sidebar />
+        <main className="md:ml-64 p-6">
+          <div className="text-center">Loading analytics...</div>
+        </main>
+      </div>
+    )
   }
 
-  const marketSentiment = {
-    overall: 72,
-    trend: "Bullish",
-    change: "+5.2%",
-    fearGreedIndex: 68,
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <MobileHeader showSidebarButton />
+        <Sidebar />
+        <main className="md:ml-64 p-6">
+          <div className="text-center text-red-500">Error loading analytics: {error}</div>
+        </main>
+      </div>
+    )
   }
 
-  const sectorSentiment = [
-    { sector: "Technology", sentiment: 78, change: "+3.2%", trend: "up" },
-    { sector: "Healthcare", sentiment: 65, change: "+1.8%", trend: "up" },
-    { sector: "Financials", sentiment: 58, change: "-2.1%", trend: "down" },
-    { sector: "Energy", sentiment: 82, change: "+7.5%", trend: "up" },
-    { sector: "Consumer Discretionary", sentiment: 45, change: "-4.3%", trend: "down" },
-    { sector: "Real Estate", sentiment: 52, change: "+0.8%", trend: "up" },
-  ]
-
-  const marketIndicators = [
-    { name: "VIX (Volatility)", value: "18.5", change: "-2.3%", status: "low" },
-    { name: "Put/Call Ratio", value: "0.85", change: "+5.1%", status: "neutral" },
-    { name: "High-Low Index", value: "0.72", change: "+1.8%", status: "high" },
-    { name: "Advance/Decline", value: "1.45", change: "+3.2%", status: "high" },
-  ]
-
-  const newsAnalysis = [
-    {
-      headline: "Fed Signals Dovish Stance on Interest Rates",
-      sentiment: "Positive",
-      impact: "High",
-      relevance: 95,
-      source: "Reuters",
-      time: "2 hours ago",
-    },
-    {
-      headline: "Tech Earnings Beat Expectations Across Sector",
-      sentiment: "Positive",
-      impact: "Medium",
-      relevance: 88,
-      source: "Bloomberg",
-      time: "4 hours ago",
-    },
-    {
-      headline: "Geopolitical Tensions Rise in Eastern Europe",
-      sentiment: "Negative",
-      impact: "Medium",
-      relevance: 72,
-      source: "Financial Times",
-      time: "6 hours ago",
-    },
-    {
-      headline: "Oil Prices Surge on Supply Chain Disruptions",
-      sentiment: "Mixed",
-      impact: "High",
-      relevance: 85,
-      source: "Wall Street Journal",
-      time: "8 hours ago",
-    },
-  ]
-
-  const aiInsights = [
-    {
-      type: "Market Opportunity",
-      title: "Defensive Rotation Signal",
-      description:
-        "AI models detect increased institutional flow into defensive sectors. Consider utilities and consumer staples.",
-      confidence: 87,
-      timeframe: "1-2 weeks",
-    },
-    {
-      type: "Risk Alert",
-      title: "Correlation Spike Warning",
-      description: "Cross-asset correlations reaching 6-month highs. Diversification benefits may be reduced.",
-      confidence: 92,
-      timeframe: "Immediate",
-    },
-    {
-      type: "Technical Signal",
-      title: "Support Level Test",
-      description: "S&P 500 approaching key support at 4,200. Watch for potential bounce or breakdown.",
-      confidence: 78,
-      timeframe: "3-5 days",
-    },
-  ]
-
-  const navigationItems = [
-    { id: "dashboard", label: "Dashboard", icon: Home, onClick: () => navigate("/dashboard") },
-    { id: "portfolio", label: "Portfolio", icon: Wallet, onClick: () => navigate("/portfolio") },
-    { id: "chat", label: "AI Assistant", icon: MessageSquare, onClick: () => navigate("/chat") },
-    { id: "goals", label: "Goals", icon: Target },
-    { id: "analytics", label: "Analytics", icon: BarChart3, active: true },
-    { id: "alerts", label: "Alerts", icon: Bell, onClick: () => navigate("/alerts") },
-  ]
-
-  const SidebarContent = () => (
-    <div className="flex flex-col h-full">
-      <div className="flex items-center gap-2 mb-8 px-6 pt-6">
-        <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-          <DollarSign className="h-5 w-5 text-primary-foreground" />
-        </div>
-        <span className="text-xl font-bold text-primary">FinRAG</span>
+  if (!analytics) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <MobileHeader showSidebarButton />
+        <Sidebar />
+        <main className="md:ml-64 p-6">
+          <div className="text-center text-muted-foreground">No analytics data available</div>
+        </main>
       </div>
+    )
+  }
 
-      <nav className="space-y-2 px-6 flex-1">
-        {navigationItems.map((item) => (
-          <Button
-            key={item.id}
-            variant={activeTab === item.id ? "secondary" : "ghost"}
-            className="w-full justify-start gap-3"
-            onClick={() => {
-              if (item.onClick) {
-                item.onClick()
-              } else {
-                setActiveTab(item.id)
-              }
-              setIsMobileMenuOpen(false)
-            }}
-          >
-            <item.icon className="h-4 w-4" />
-            {item.label}
-          </Button>
-        ))}
-      </nav>
-
-      <div className="px-6 pb-6 space-y-2">
-        <Button variant="ghost" className="w-full justify-start gap-3">
-          <Settings className="h-4 w-4" />
-          Settings
-        </Button>
-        <Button variant="ghost" className="w-full justify-start gap-3" onClick={handleLogout}>
-          <LogOut className="h-4 w-4" />
-          Sign Out
-        </Button>
-      </div>
-    </div>
-  )
+  const { portfolio, goals } = analytics
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Desktop Sidebar */}
-      <div className="hidden lg:fixed lg:left-0 lg:top-0 lg:h-full lg:w-64 lg:bg-card lg:border-r lg:border-border lg:block">
-        <SidebarContent />
-      </div>
+    <div className="min-h-screen bg-gray-50">
+      <MobileHeader showSidebarButton />
+      <Sidebar />
 
-      {/* Mobile Header */}
-      <div className="lg:hidden bg-card border-b border-border p-4 flex items-center justify-between sticky top-0 z-40">
-        <div className="flex items-center gap-3">
-          <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="sm" className="lg:hidden">
-                <Menu className="h-5 w-5" />
-                <span className="sr-only">Open menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="p-0 w-64 z-50">
-              <SidebarContent />
-            </SheetContent>
-          </Sheet>
-          
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <DollarSign className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-bold text-primary">FinRAG</span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Avatar className="h-8 w-8">
-            <AvatarImage src={user?.avatar || "/placeholder.svg"} />
-            <AvatarFallback>
-              <User className="h-4 w-4" />
-            </AvatarFallback>
-          </Avatar>
-          <span className="text-sm font-medium hidden sm:block">{user?.name}</span>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="lg:ml-64">
-        <div className="hidden lg:flex items-center justify-between p-6 bg-card border-b border-border">
+      <main className="md:ml-64 p-6">
+        {/* Header */}
+        <div className="hidden md:flex items-center justify-between mb-6 bg-white p-6 rounded-lg shadow">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Market Analytics</h1>
-            <p className="text-muted-foreground">AI-powered market sentiment and analysis</p>
+            <h1 className="text-2xl font-bold">Portfolio Analytics</h1>
+            <p className="text-gray-600">Insights and performance metrics</p>
           </div>
-          <div className="flex items-center gap-4">
-            <Button onClick={() => navigate("/chat")} size="sm">
-              <MessageSquare className="h-4 w-4 mr-2" />
-              Ask AI Assistant
-            </Button>
-            <div className="flex items-center gap-3">
-              <Avatar className="h-8 w-8">
-                <AvatarImage src={user?.avatar || "/placeholder.svg"} />
-                <AvatarFallback>
-                  <User className="h-4 w-4" />
-                </AvatarFallback>
-              </Avatar>
-              <div className="text-right">
-                <div className="text-sm font-medium">{user?.name}</div>
-                <div className="text-xs text-muted-foreground">{user?.email}</div>
-              </div>
-            </div>
-          </div>
+          <Button onClick={() => navigate("/chat")} size="sm">
+            Ask AI Assistant
+          </Button>
         </div>
 
-        <div className="p-4 lg:p-6">
-          {/* Mobile page title with actions */}
-          <div className="lg:hidden mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h1 className="text-2xl font-bold text-foreground">Analytics</h1>
-                <p className="text-muted-foreground">Market insights and sentiment</p>
-              </div>
-              <Button onClick={() => navigate("/chat")} size="sm">
-                <MessageSquare className="h-4 w-4 mr-2" />
-                AI
-              </Button>
-            </div>
-          </div>
-
-          {/* Market Overview */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Market Sentiment</CardTitle>
-                <Activity className="h-4 w-4 text-primary" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{marketSentiment.overall}%</div>
-                <Badge variant="default" className="mt-2">
-                  {marketSentiment.trend}
-                </Badge>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Fear & Greed Index</CardTitle>
-                <Brain className="h-4 w-4 text-orange-500" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{marketSentiment.fearGreedIndex}</div>
-                <Badge variant="secondary" className="mt-2">
-                  Neutral
-                </Badge>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Market Change</CardTitle>
-                <TrendingUp className="h-4 w-4 text-success" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-success">{marketSentiment.change}</div>
-                <Badge variant="default" className="mt-2">
-                  Today
-                </Badge>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">AI Confidence</CardTitle>
-                <Zap className="h-4 w-4 text-purple-500" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">89%</div>
-                <Badge variant="default" className="mt-2">
-                  High
-                </Badge>
-              </CardContent>
-            </Card>
-          </div>
-
-          <Tabs defaultValue="sentiment" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4">
-              <TabsTrigger value="sentiment" className="text-xs sm:text-sm">Sentiment</TabsTrigger>
-              <TabsTrigger value="indicators" className="text-xs sm:text-sm">Indicators</TabsTrigger>
-              <TabsTrigger value="news" className="text-xs sm:text-sm">News</TabsTrigger>
-              <TabsTrigger value="insights" className="text-xs sm:text-sm">AI Insights</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="sentiment" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Sector Sentiment Analysis</CardTitle>
-                  <CardDescription>Real-time sentiment tracking across major sectors</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {sectorSentiment.map((sector, index) => (
-                      <div key={index} className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium">{sector.sector}</span>
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm text-muted-foreground">{sector.sentiment}%</span>
-                            <div className="flex items-center gap-1">
-                              {sector.trend === "up" ? (
-                                <ArrowUp className="h-4 w-4 text-green-500" />
-                              ) : (
-                                <ArrowDown className="h-4 w-4 text-red-500" />
-                              )}
-                              <span className={`text-xs ${sector.trend === "up" ? "text-green-600" : "text-red-600"}`}>
-                                {sector.change}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                        <Progress
-                          value={sector.sentiment}
-                          className={`h-2 ${
-                            sector.sentiment >= 70
-                              ? "text-green-500"
-                              : sector.sentiment >= 50
-                                ? "text-yellow-500"
-                                : "text-red-500"
-                          }`}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="indicators" className="space-y-6">
-              <div className="grid grid-cols-1 gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Market Indicators</CardTitle>
-                    <CardDescription>Key technical and sentiment indicators</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {marketIndicators.map((indicator, index) => (
-                        <div key={index} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-lg border bg-card gap-2">
-                          <div className="flex-1">
-                            <div className="font-medium">{indicator.name}</div>
-                            <div className="text-sm text-muted-foreground">
-                              Status:{" "}
-                              <span
-                                className={
-                                  indicator.status === "high"
-                                    ? "text-green-600"
-                                    : indicator.status === "low"
-                                      ? "text-red-600"
-                                      : "text-yellow-600"
-                                }
-                              >
-                                {indicator.status.toUpperCase()}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="text-left sm:text-right">
-                            <div className="font-medium">{indicator.value}</div>
-                            <div
-                              className={`text-sm ${indicator.change.startsWith("+") ? "text-success" : "text-destructive"}`}
-                            >
-                              {indicator.change}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Market Health Score</CardTitle>
-                    <CardDescription>Composite health indicator</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-6">
-                      <div className="text-center">
-                        <div className="text-4xl font-bold text-green-600">B+</div>
-                        <div className="text-sm text-muted-foreground">Overall Market Health</div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="flex justify-between">
-                          <span className="text-sm">Liquidity</span>
-                          <span className="text-sm font-medium">Good</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-sm">Volatility</span>
-                          <span className="text-sm font-medium">Moderate</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-sm">Momentum</span>
-                          <span className="text-sm font-medium">Strong</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-sm">Breadth</span>
-                          <span className="text-sm font-medium">Healthy</span>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="news" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>News Sentiment Analysis</CardTitle>
-                  <CardDescription>AI-powered analysis of market-moving news</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {newsAnalysis.map((news, index) => (
-                      <div key={index} className="p-4 rounded-lg border bg-card">
-                        <div className="space-y-3">
-                          <h4 className="font-medium text-sm leading-relaxed">{news.headline}</h4>
-                          <div className="flex flex-wrap items-center gap-2">
-                            <Badge
-                              variant={
-                                news.sentiment === "Positive"
-                                  ? "default"
-                                  : news.sentiment === "Negative"
-                                    ? "destructive"
-                                    : "secondary"
-                              }
-                              className="text-xs"
-                            >
-                              {news.sentiment}
-                            </Badge>
-                            <Badge variant="outline" className="text-xs">
-                              {news.impact} Impact
-                            </Badge>
-                            <div className="text-xs text-muted-foreground">Relevance: {news.relevance}%</div>
-                          </div>
-                          <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
-                            <span>{news.source}</span>
-                            <span>{news.time}</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="insights" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>AI Market Insights</CardTitle>
-                  <CardDescription>Advanced AI analysis and predictions</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {aiInsights.map((insight, index) => (
-                      <div key={index} className="p-4 rounded-lg border bg-card">
-                        <div className="flex items-start justify-between mb-2">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <Badge variant="outline" className="text-xs">
-                                {insight.type}
-                              </Badge>
-                              <span className="text-xs text-muted-foreground">Confidence: {insight.confidence}%</span>
-                            </div>
-                            <h4 className="font-medium">{insight.title}</h4>
-                            <p className="text-sm text-muted-foreground mt-1">{insight.description}</p>
-                            <div className="text-xs text-muted-foreground mt-2">Timeframe: {insight.timeframe}</div>
-                          </div>
-                        </div>
-                        <Progress value={insight.confidence} className="h-1 mt-3" />
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+        {/* Key Metrics Summary */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+          <MetricCard
+            title="Total Value"
+            value={portfolio?.totalValue?.toFixed(2) || '0.00'}
+            icon="💰"
+          />
+          <MetricCard
+            title="Cash Balance"
+            value={portfolio?.cashBalance?.toFixed(2) || '0.00'}
+            icon="💵"
+            percentage={portfolio?.cashRatio?.toFixed(1)}
+          />
+          <MetricCard
+            title="Invested Value"
+            value={portfolio?.investedValue?.toFixed(2) || '0.00'}
+            icon="📈"
+          />
+          <MetricCard
+            title="Diversification"
+            value={portfolio?.diversificationScore || 'N/A'}
+            icon="🎯"
+            showBadge
+          />
         </div>
+
+        {/* Tabs */}
+        <Tabs defaultValue="overview" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="allocation">Allocation</TabsTrigger>
+            <TabsTrigger value="goals">Goals</TabsTrigger>
+          </TabsList>
+
+          {/* Overview Tab */}
+          <TabsContent value="overview">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Portfolio Health</CardTitle>
+                  <CardDescription>Risk and diversification metrics</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <HealthMetric
+                    label="Concentration Risk"
+                    value={portfolio?.concentrationRisk?.toFixed(2) || '0.00'}
+                    unit="%"
+                    description="Largest holding as % of portfolio"
+                    status={getConcentrationStatus(portfolio?.concentrationRisk)}
+                  />
+                  <HealthMetric
+                    label="Cash Ratio"
+                    value={portfolio?.cashRatio?.toFixed(2) || '0.00'}
+                    unit="%"
+                    description="Cash as % of total portfolio"
+                    status={getCashRatioStatus(portfolio?.cashRatio)}
+                  />
+                  <HealthMetric
+                    label="Diversification Score"
+                    value={portfolio?.diversificationScore || 'N/A'}
+                    description="Overall portfolio diversification"
+                    status={getDiversificationStatus(portfolio?.diversificationScore)}
+                  />
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Portfolio Composition</CardTitle>
+                  <CardDescription>Breakdown of your investments</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex justify-between items-center p-4 border rounded-lg">
+                    <div>
+                      <div className="font-medium">Total Value</div>
+                      <div className="text-sm text-muted-foreground">Complete portfolio worth</div>
+                    </div>
+                    <div className="text-2xl font-bold">₹{portfolio?.totalValue?.toFixed(2) || '0.00'}</div>
+                  </div>
+                  <div className="flex justify-between items-center p-4 border rounded-lg">
+                    <div>
+                      <div className="font-medium">Invested Amount</div>
+                      <div className="text-sm text-muted-foreground">Stocks and securities</div>
+                    </div>
+                    <div className="text-2xl font-bold">₹{portfolio?.investedValue?.toFixed(2) || '0.00'}</div>
+                  </div>
+                  <div className="flex justify-between items-center p-4 border rounded-lg">
+                    <div>
+                      <div className="font-medium">Available Cash</div>
+                      <div className="text-sm text-muted-foreground">Ready for investment</div>
+                    </div>
+                    <div className="text-2xl font-bold">₹{portfolio?.cashBalance?.toFixed(2) || '0.00'}</div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Allocation Tab */}
+          <TabsContent value="allocation">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Asset Allocation by Symbol</CardTitle>
+                  <CardDescription>Distribution across stocks</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {portfolio?.allocationBySymbol && Object.keys(portfolio.allocationBySymbol).length > 0 ? (
+                    Object.entries(portfolio.allocationBySymbol).map(
+                      ([symbol, value]: [string, any]) => {
+                        const percentage = portfolio.totalValue > 0 
+                          ? ((Number(value) / portfolio.totalValue) * 100).toFixed(1)
+                          : '0.0'
+                        return (
+                          <div key={symbol} className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span className="font-medium">{symbol}</span>
+                              <span className="text-muted-foreground">
+                                {percentage}% • ₹{Number(value).toFixed(2)}
+                              </span>
+                            </div>
+                            <Progress value={parseFloat(percentage)} />
+                          </div>
+                        )
+                      }
+                    )
+                  ) : (
+                    <div className="text-center text-muted-foreground py-8">
+                      No holdings yet. Start investing to see allocation.
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Sector Allocation</CardTitle>
+                  <CardDescription>Distribution across sectors</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {portfolio?.allocationBySector && Object.keys(portfolio.allocationBySector).length > 0 ? (
+                    Object.entries(portfolio.allocationBySector).map(
+                      ([sector, value]: [string, any]) => {
+                        const percentage = portfolio.totalValue > 0 
+                          ? ((Number(value) / portfolio.totalValue) * 100).toFixed(1)
+                          : '0.0'
+                        return (
+                          <div key={sector} className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span className="font-medium">{sector}</span>
+                              <span className="text-muted-foreground">
+                                {percentage}% • ₹{Number(value).toFixed(2)}
+                              </span>
+                            </div>
+                            <Progress value={parseFloat(percentage)} />
+                          </div>
+                        )
+                      }
+                    )
+                  ) : (
+                    <div className="text-center text-muted-foreground py-8">
+                      No sector data available
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Goals Tab */}
+          <TabsContent value="goals">
+            <Card>
+              <CardHeader>
+                <CardTitle>Financial Goals Progress</CardTitle>
+                <CardDescription>Track your savings and investment goals</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {goals && goals.length > 0 ? (
+                  goals.map((g: any, idx: number) => (
+                    <div key={idx} className="p-4 border rounded-lg space-y-3">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <div className="font-medium text-lg">{g.title}</div>
+                          <Badge variant={g.status === 'on-track' ? 'default' : 'destructive'} className="mt-1">
+                            {g.status}
+                          </Badge>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-2xl font-bold">{g.completion?.toFixed(1) || '0.0'}%</div>
+                          <div className="text-sm text-muted-foreground">Complete</div>
+                        </div>
+                      </div>
+                      
+                      <Progress value={g.completion || 0} className="h-3" />
+                      
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        {g.requiredMonthly && (
+                          <div>
+                            <div className="text-muted-foreground">Required Monthly</div>
+                            <div className="font-medium">₹{g.requiredMonthly.toFixed(2)}</div>
+                          </div>
+                        )}
+                        {g.monthsRemaining !== null && (
+                          <div>
+                            <div className="text-muted-foreground">Months Remaining</div>
+                            <div className="font-medium">{g.monthsRemaining}</div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center text-muted-foreground py-8">
+                    No goals set yet. Create goals to track your progress.
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </main>
+    </div>
+  )
+}
+
+/* Helper Components */
+
+function MetricCard({ title, value, icon, percentage, showBadge }: any) {
+  return (
+    <Card>
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
+          <span className="text-2xl">{icon}</span>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold">
+          {showBadge ? value : `₹${value}`}
+        </div>
+        {percentage && (
+          <div className="text-sm text-muted-foreground mt-1">{percentage}% of portfolio</div>
+        )}
+      </CardContent>
+    </Card>
+  )
+}
+
+function HealthMetric({ label, value, unit, description, status }: any) {
+  return (
+    <div className="flex justify-between items-center p-3 border rounded-lg">
+      <div>
+        <div className="font-medium">{label}</div>
+        <div className="text-xs text-muted-foreground">{description}</div>
+      </div>
+      <div className="text-right">
+        <div className="text-xl font-bold">
+          {value}{unit}
+        </div>
+        <Badge variant={status === 'good' ? 'default' : status === 'moderate' ? 'secondary' : 'destructive'} className="mt-1">
+          {status}
+        </Badge>
       </div>
     </div>
   )
+}
+
+/* Helper Functions */
+
+function getConcentrationStatus(risk?: number): string {
+  if (!risk) return 'unknown'
+  if (risk < 20) return 'good'
+  if (risk < 40) return 'moderate'
+  return 'high'
+}
+
+function getCashRatioStatus(ratio?: number): string {
+  if (!ratio) return 'unknown'
+  if (ratio >= 10 && ratio <= 30) return 'good'
+  if (ratio < 10 || ratio <= 50) return 'moderate'
+  return 'high'
+}
+
+function getDiversificationStatus(score?: string): string {
+  if (!score) return 'unknown'
+  if (score === 'High') return 'good'
+  if (score === 'Medium') return 'moderate'
+  return 'low'
 }
